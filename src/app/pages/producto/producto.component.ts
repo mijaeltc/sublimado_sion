@@ -13,8 +13,8 @@ import { CommonModule } from '@angular/common';
 })
 export class ProductoComponent {
   products = [
-    { id: 1, name: 'T-Shirt Sublimated 1', description: 'High quality sublimated T-Shirt', image: 'assets/images/tshirt1.jpg' },
-    { id: 2, name: 'T-Shirt Sublimated 2', description: 'High quality sublimated T-Shirt', image: 'assets/images/tshirt2.jpg' },
+    { id: 1, name: 'T-Shirt Sublimated 1', description: 'High quality sublimated T-Shirt', image: 'assets/images/pro01.jpg' },
+    { id: 2, name: 'T-Shirt Sublimated 2', description: 'High quality sublimated T-Shirt', image: 'assets/images/pro02.jpg' },
     // Más productos aquí
   ];
 }
