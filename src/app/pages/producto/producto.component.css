@@ -1,0 +1,55 @@
+.app-container {
+    display: flex;
+  }
+  
+  .category-filter {
+    width: 200px;
+    padding: 10px;
+    border-right: 1px solid #ccc;
+  }
+  
+  .products-container {
+    flex-grow: 1;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .product-card {
+    width: 200px;
+    margin: 10px;
+  }
+
+  .banner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 250px; /* Ajusta la altura según prefieras */
+    color: white;
+    text-align: center;
+    background-image: url('../../../assets/images/banner3.png'); /* Ruta de la imagen */
+    background-size: cover;
+    background-position:50% 25%; /* Ajusta la posición de la imagen */
+    margin-bottom: 20px;
+  }
+
+  /* Superposición oscura */
+  .banner::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* Oscurecimiento semi-transparente */
+    z-index: 1;
+  }
+
+  .banner h2 {
+    position: relative;
+    font-size: 4rem;
+    margin: 0;
+    padding: 10px 20px;
+    z-index: 2; /* Para que el texto esté por encima del oscurecimiento */
+  }
