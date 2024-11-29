@@ -1,3 +1,35 @@
+<div class="banner">
+  <h2>Nuestros<br><br>Productos</h2>
+</div>
+
+<div class="app-container">
+  <!-- Filtro de categorías -->
+  <div class="category-filter">
+    <div *ngFor="let categoria of categorias">
+      <button (click)="filtrarPorCategoria(categoria.id)" mat-button>
+          {{ categoria.nombre }}
+      </button>
+  </div>
+  </div>
+
+  <!-- Lista de productos --> 
+  <div class="products-container">
+    <mat-card *ngFor="let product of products" class="product-card">
+      <mat-card-header>
+        <mat-card-title>{{ product.nombre }}</mat-card-title>
+      </mat-card-header>
+      <img mat-card-image [src]="product.imagen" alt="{{ product.nombre }}"> 
+      <mat-card-content>
+        <p>{{ product.descripcion }}</p>
+        <p>Precio: {{ product.precio | currency }}</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button [routerLink]="['/product', product.id]">Ver Detalles</button>
+        <button mat-button>Agregar al Carrito</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>
 <!DOCTYPE html>
 <html lang="es">
 <head>
