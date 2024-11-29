@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
 import { MatCardModule }  from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,7 +18,7 @@ import { WishlistService } from '../../services/wishlist.service';
 @Component({
   selector: 'app-producto',
   standalone: true,
-  imports: [ RouterOutlet, MatCardModule, RouterLink, CommonModule ],
+  imports: [ MatCardModule, CommonModule, MatIconModule, FormsModule, MatToolbarModule, MatButtonModule ],
   templateUrl: './producto.component.html',
   styleUrl: './producto.component.css'
 })
@@ -29,7 +28,9 @@ export class ProductoComponent implements OnInit {
   selectedCategoriaId: number = 0;
   selectedCategory: string | null = null;
 
-  constructor(private productoService: ProductoService, private categoriaService: CategoriaService) { }
+  constructor(private productoService: ProductoService, private categoriaService: CategoriaService,
+    private cartService: CartService, public wishlistService: WishlistService
+  ) { }
 
   ngOnInit(): void {
     this.cargarProductos();
@@ -58,44 +59,109 @@ export class ProductoComponent implements OnInit {
     this.selectedCategoriaId = categoriaId;
     this.cargarProductos(categoriaId); // Filtra por la categoría seleccionada
 }
+ 
+  selectedProduct: any = null;
+  message: string = '';
+  selectedSize: string = '';
   
- /*
-  products = [
-    { id: 1, name: 'Jonas Brothers - Camiseta',  category: "JONAS BROTHERS", description: 'High quality sublimated T-Shirt', image: 'assets/images/pro01.png' },
-    { id: 2, name: 'Karol G - Camiseta',  category: "KAROL G", description: 'High quality sublimated T-Shirt', image: 'assets/images/pro02.png' },
-    { id: 3, name: 'Taylor - Camiseta',  category: "TAYLOR SWIFT", description: 'High quality sublimated T-Shirt', image: 'assets/images/pro03.png' },
-    { id: 4, name: 'Morat - Camiseta',  category: "MORAT", description: 'High quality sublimated T-Shirt', image: 'assets/images/pro04.png' },
-    // Más productos aquí
-  ];
-  
-  get filteredProducts() {
-    return this.selectedCategory 
-      ? this.products.filter(product => product.category === this.selectedCategory) 
-      : this.products;
-  }
 
-  
-  filterByCategory(category: string | null) {
-    this.selectedCategory = category;
-  }
-
-  onCategorySelect(category: string) {
-    this.selectedCategory = category;
-    this.productoService.listarProductos(category).subscribe(
-      (data) => {
-        this.products = data;
-      },
-      (error) => {
-        console.error('Error al cargar productos filtrados', error);
+  filtrarProductos(): void {
+    const busqueda = (document.getElementById('search-input') as HTMLInputElement).value.toLowerCase();
+    const productos = document.querySelectorAll('.product-box');
+    productos.forEach((producto: any) => {
+      const nombre = producto.querySelector('h3').innerText.toLowerCase();
+      if (nombre.includes(busqueda)) {
+        producto.style.display = 'block';
+      } else {
+        producto.style.display = 'none';
       }
-    );
+    });
   }
-    
-  */
-}
+  openProductDetail(product: any): void {
+    this.selectedProduct = product;
+  }
 
-export class ProductoComponent {
+  closeProductDetail(): void {
+    this.selectedProduct = null;
+  }
 
+  generateStars(rating: number) {
+    const stars = [];
+    const fullStars = Math.floor(rating); // Estrellas completas
+    const halfStar = rating % 1 >= 0.5 ? 1 : 0; // Media estrella
+    const emptyStars = 5 - fullStars - halfStar; // Estrellas vacías
+  
+    // Añadir estrellas completas
+    for (let i = 0; i < fullStars; i++) {
+      stars.push('full');
+    }
+  
+    // Añadir media estrella
+    if (halfStar) {
+      stars.push('half');
+    }
+  
+    // Añadir estrellas vacías
+    for (let i = 0; i < emptyStars; i++) {
+      stars.push('empty');
+    }
+  
+    return stars;
+  }
+
+  addToCart(): void {
+    if (this.selectedProduct && this.selectedSize) {
+      // Crear un objeto con el producto y la talla seleccionada
+      const productWithSize = { ...this.selectedProduct, selectedSize: this.selectedSize };
+      
+      // Añadir al carrito usando el servicio
+      this.cartService.addProducto(productWithSize);
+      console.log(`Producto añadido al carrito: ${this.selectedProduct.name}, Talla: ${this.selectedSize}`);
+
+      // Mostrar mensaje de éxito
+      this.message = `${this.selectedProduct.name} (${this.selectedSize}) ha sido añadido al carrito`;
+
+      // Opcional: Ocultar el mensaje después de 3 segundos
+      setTimeout(() => {
+        this.message = '';
+      }, 2000);
+    } else {
+      // Si no se ha seleccionado una talla
+      this.message = 'Por favor, selecciona una talla.';
+      setTimeout(() => {
+        this.message = '';
+      }, 2000);
+    }
+  }
+
+  addToWishlist(event: Event, product: any): void {
+    event.stopPropagation(); // Detenemos la propagación del clic al contenedor principal
+  
+    // Verificamos si el producto ya está en la lista de deseos
+    const exists = this.wishlistService.isInWishlist(product);
+  
+    if (exists) {
+      // Si ya está, lo quitamos de la lista
+      this.wishlistService.removeFromWishlist(product);
+      console.log(`${product.name} eliminado de la lista de deseos.`);
+      this.message = `${product.name} ha sido eliminado de la lista de deseos.`;
+    } else {
+      // Si no está, lo agregamos
+      this.wishlistService.addProduct(product);
+      console.log(`${product.name} añadido a la lista de deseos.`);
+      this.message = `${product.name} ha sido añadido a la lista de deseos.`;
+    }
+  
+    // Ocultar el mensaje después de 3 segundos
+    setTimeout(() => {
+      this.message = '';
+    }, 3000);
+  }
+
+  isInWishlist(product: any): boolean {
+    return this.wishlistService.isInWishlist(product);
+  }
+  
   productos = [
     {
       name: 'Corazones',
@@ -171,109 +237,4 @@ export class ProductoComponent {
     }
   ];
 
-  selectedProduct: any = null;
-  message: string = '';
-  selectedSize: string = '';
-  
-
-  constructor(private cartService: CartService, public wishlistService: WishlistService) { }
-
-  openProductDetail(product: any): void {
-    this.selectedProduct = product;
-  }
-
-  closeProductDetail(): void {
-    this.selectedProduct = null;
-  }
-
-  generateStars(rating: number) {
-    const stars = [];
-    const fullStars = Math.floor(rating); // Estrellas completas
-    const halfStar = rating % 1 >= 0.5 ? 1 : 0; // Media estrella
-    const emptyStars = 5 - fullStars - halfStar; // Estrellas vacías
-  
-    // Añadir estrellas completas
-    for (let i = 0; i < fullStars; i++) {
-      stars.push('full');
-    }
-  
-    // Añadir media estrella
-    if (halfStar) {
-      stars.push('half');
-    }
-  
-    // Añadir estrellas vacías
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push('empty');
-    }
-  
-    return stars;
-  }
-
-  addToCart(): void {
-    if (this.selectedProduct && this.selectedSize) {
-      // Crear un objeto con el producto y la talla seleccionada
-      const productWithSize = { ...this.selectedProduct, selectedSize: this.selectedSize };
-      
-      // Añadir al carrito usando el servicio
-      this.cartService.addProducto(productWithSize);
-      console.log(`Producto añadido al carrito: ${this.selectedProduct.name}, Talla: ${this.selectedSize}`);
-
-      // Mostrar mensaje de éxito
-      this.message = `${this.selectedProduct.name} (${this.selectedSize}) ha sido añadido al carrito`;
-
-      // Opcional: Ocultar el mensaje después de 3 segundos
-      setTimeout(() => {
-        this.message = '';
-      }, 2000);
-    } else {
-      // Si no se ha seleccionado una talla
-      this.message = 'Por favor, selecciona una talla.';
-      setTimeout(() => {
-        this.message = '';
-      }, 2000);
-    }
-  }
-
-  filtrarProductos(): void {
-    const busqueda = (document.getElementById('search-input') as HTMLInputElement).value.toLowerCase();
-    const productos = document.querySelectorAll('.product-box');
-    productos.forEach((producto: any) => {
-      const nombre = producto.querySelector('h3').innerText.toLowerCase();
-      if (nombre.includes(busqueda)) {
-        producto.style.display = 'block';
-      } else {
-        producto.style.display = 'none';
-      }
-    });
-  }
-
-  addToWishlist(event: Event, product: any): void {
-    event.stopPropagation(); // Detenemos la propagación del clic al contenedor principal
-  
-    // Verificamos si el producto ya está en la lista de deseos
-    const exists = this.wishlistService.isInWishlist(product);
-  
-    if (exists) {
-      // Si ya está, lo quitamos de la lista
-      this.wishlistService.removeFromWishlist(product);
-      console.log(`${product.name} eliminado de la lista de deseos.`);
-      this.message = `${product.name} ha sido eliminado de la lista de deseos.`;
-    } else {
-      // Si no está, lo agregamos
-      this.wishlistService.addProduct(product);
-      console.log(`${product.name} añadido a la lista de deseos.`);
-      this.message = `${product.name} ha sido añadido a la lista de deseos.`;
-    }
-  
-    // Ocultar el mensaje después de 3 segundos
-    setTimeout(() => {
-      this.message = '';
-    }, 3000);
-  }
-
-  isInWishlist(product: any): boolean {
-    return this.wishlistService.isInWishlist(product);
-  }
 }
-
