@@ -1,6 +1,13 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
+import { provideRouter } from '@angular/router';
 import { AppComponent } from './app/app.component';
+import { appRoutes } from './app/app.routes';  // Asegúrate de importar appRoutes
+import { provideHttpClient } from '@angular/common/http';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'; // Asegúrate de incluir este proveedor también
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideRouter(appRoutes), 
+    provideHttpClient(), provideAnimationsAsync() // Esta línea asegura que HttpClient esté disponible en toda la aplicación
+  ],
+}).catch((err) => console.error(err));

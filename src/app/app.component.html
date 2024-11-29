@@ -1,9 +1,44 @@
-<mat-toolbar color="primary">
-  <span>Sublimados Sion</span>
-  <button mat-button routerLink="/">Inicio</button>
-  <button mat-button routerLink="/productos">Productos</button>
-  <button mat-button routerLink="/carrito">Carrito</button>
-  <button mat-button routerLink="/login">Login</button>
-</mat-toolbar>
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Poppins&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="app.component.css">
+</head>
 
-<router-outlet></router-outlet> <!-- Aquí se cargará el componente correspondiente a la ruta -->
+<body>
+  <nav class="sidebar">
+    <ul>
+      <li><a routerLink="/inicio" onclick="toggleMenu()">Inicio</a></li>
+      <li><span class="separator">|</span></li>
+      <li><a routerLink="/productos" onclick="toggleMenu()">Productos</a></li>
+      <li><span class="separator">|</span></li>
+      <li><a routerLink="/personalizar" onclick="toggleMenu()">Personalizar</a></li>
+      <li><span class="separator">|</span></li>
+      <li><a routerLink="/dudas" onclick="toggleMenu()">Otro</a></li>
+      <li><span class="separator">|</span></li>
+      <li><a routerLink="/register" onclick="toggleMenu()">Dudas
+          </a></li>
+          <li><span class="separator"></span></li>      
+      <div class="right-buttons">
+        <a routerLink="/login" class="image-button">
+          <img src="assets/imgs/usuario.png" alt="Register" />
+        </a>
+        <a routerLink="/listadeseos" class="image-button">
+          <img src="assets/imgs/heart.png" alt="Register" />
+        </a>
+        <a routerLink="/carrito" class="image-button">
+          <img src="assets/imgs/carros.png" alt="Cart" />
+        </a>
+      </div>
+    </ul>
+
+    <!-- Contenedor para las imágenes alineadas a la derecha -->
+  </nav>
+
+  <div class="main-container">
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</body>
